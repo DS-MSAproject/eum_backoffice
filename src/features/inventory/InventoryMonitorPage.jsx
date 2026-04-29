@@ -19,29 +19,27 @@ export default function InventoryMonitorPage() {
 
   const { data: inventory, isLoading: invLoading } = useGetInventoryStatusQuery(undefined, { skip: tab !== 0 })
   const { data: events, isLoading: eventsLoading } = useGetInventoryEventHistoryQuery({ page: 0, size: 50 }, { skip: tab !== 1 })
-  const { data: traceData, isLoading: traceLoading } = useTraceInventoryByProductQuery(traceProductId, {
-    skip: tab !== 2 || !traceProductId,
-  })
+  const { data: traceData, isLoading: traceLoading } = useTraceInventoryByProductQuery(
+    { productId: traceProductId },
+    { skip: tab !== 2 || !traceProductId },
+  )
 
   const inventoryColumns = [
     { key: 'productId', header: '상품ID', render: (r) => <span className="font-mono text-[11px]">{r.productId}</span> },
-    { key: 'productName', header: '상품명', render: (r) => <span className="text-[13px]">{r.productName}</span> },
-    { key: 'currentStock', header: '현재고', render: (r) => (
-      <span className={`font-bold ${r.currentStock <= 0 ? 'text-red-400' : r.currentStock <= 10 ? 'text-yellow-400' : 'text-emerald-400'}`}>
-        {formatNumber(r.currentStock)}
-      </span>
+    { key: 'optionId', header: '옵션ID', render: (r) => (
+      <span className="font-mono text-[11px] text-slate-400">{r.optionId ?? '-'}</span>
     )},
-    { key: 'reservedStock', header: '예약고', render: (r) => formatNumber(r.reservedStock) },
-    { key: 'availableStock', header: '가용고', render: (r) => (
-      <span className="font-bold text-slate-300">{formatNumber(r.availableStock)}</span>
+    { key: 'stockQuantity', header: '현재고', render: (r) => (
+      <span className={`font-bold ${r.stockQuantity <= 0 ? 'text-red-400' : r.stockQuantity <= 10 ? 'text-yellow-400' : 'text-emerald-400'}`}>
+        {formatNumber(r.stockQuantity)}
+      </span>
     )},
     { key: 'status', header: '상태', render: (r) => (
       <Badge
-        status={r.currentStock <= 0 ? 'FAILED' : r.currentStock <= 10 ? 'PENDING' : 'COMPLETED'}
-        label={r.currentStock <= 0 ? '품절' : r.currentStock <= 10 ? '부족' : '정상'}
+        status={r.stockQuantity <= 0 ? 'FAILED' : r.stockQuantity <= 10 ? 'PENDING' : 'COMPLETED'}
+        label={r.stockQuantity <= 0 ? '품절' : r.stockQuantity <= 10 ? '부족' : '정상'}
       />
     )},
-    { key: 'updatedAt', header: '갱신시각', render: (r) => formatDate(r.updatedAt) },
   ]
 
   const eventColumns = [
@@ -72,11 +70,11 @@ export default function InventoryMonitorPage() {
 
       {tab === 0 && (
         <div className="space-y-4">
-          {inventory?.some(i => i.currentStock <= 10) && (
+          {inventory?.some(i => i.stockQuantity <= 10) && (
             <div className="flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-4 py-3">
               <AlertTriangle size={16} className="text-yellow-400" />
               <p className="text-[13px] text-yellow-300 font-bold">
-                재고 부족 품목이 {inventory.filter(i => i.currentStock <= 10).length}개 있습니다.
+                재고 부족 품목이 {inventory.filter(i => i.stockQuantity <= 10).length}개 있습니다.
               </p>
             </div>
           )}

@@ -17,7 +17,12 @@ const rawBaseQuery = fetchBaseQuery({
 
 const baseQuery = async (args, api, extra) => {
   const result = await rawBaseQuery(args, api, extra)
-  if (result.error?.status === 401) api.dispatch({ type: 'auth/logout' })
+  // getAdminMe 는 AdminProtectedRoute 에서 isError 로 처리하므로 제외.
+  // 그 외 401 은 이미 로그인된 상태에서 세션이 만료된 것이므로 logout 처리.
+  const url = typeof args === 'string' ? args : args?.url ?? ''
+  if (result.error?.status === 401 && !url.includes('/admin/auth/me')) {
+    api.dispatch({ type: 'auth/logout' })
+  }
   return result
 }
 

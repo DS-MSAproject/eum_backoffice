@@ -15,7 +15,9 @@ import '@/api/monitoringApi'
 const logoutMiddleware = (storeAPI) => (next) => (action) => {
   const result = next(action)
   if (action.type === logout.type) {
-    storeAPI.dispatch(apiSlice.util.resetApiState())
+    // resetApiState() 는 전체 캐시를 지워 getAdminMe 를 재요청시키므로 사용하지 않음.
+    // adminLogout 뮤테이션이 invalidatesTags(['Auth:ME']) 로 충분히 처리함.
+    storeAPI.dispatch(apiSlice.util.invalidateTags([{ type: 'Auth', id: 'ME' }]))
   }
   return result
 }
