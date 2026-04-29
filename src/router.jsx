@@ -8,6 +8,7 @@ import PaymentReconciliationPage from '@/features/payment/PaymentReconciliationP
 import InventoryMonitorPage from '@/features/inventory/InventoryMonitorPage'
 import ServiceHealthPage from '@/features/monitoring/ServiceHealthPage'
 import LogViewerPage from '@/features/monitoring/LogViewerPage'
+import ProductManagementPage from '@/features/product/ProductManagementPage'
 
 const router = createBrowserRouter([
   {
@@ -24,6 +25,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/dashboard" replace /> },
       { path: 'dashboard', element: <DashboardPage /> },
+      { path: 'products', element: <ProductManagementPage /> },
       { path: 'orders', element: <OrderManagementPage /> },
       { path: 'payments', element: <PaymentReconciliationPage /> },
       { path: 'inventory', element: <InventoryMonitorPage /> },

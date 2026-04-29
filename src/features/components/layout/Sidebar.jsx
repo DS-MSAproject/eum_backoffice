@@ -10,15 +10,17 @@ import {
   FileText,
   ShieldCheck,
   ChevronRight,
+  Store,
 } from 'lucide-react'
 
 const NAV = [
   { to: '/dashboard', icon: LayoutDashboard, label: '대시보드' },
-  { to: '/orders', icon: ShoppingCart, label: '주문 관리' },
-  { to: '/payments', icon: CreditCard, label: '결제 관리' },
-  { to: '/inventory', icon: Package, label: '재고 관리' },
-  { to: '/monitoring', icon: Activity, label: '시스템 모니터링' },
-  { to: '/logs', icon: FileText, label: '로그 뷰어' },
+  { to: '/products',  icon: Store,           label: '상품 관리' },
+  { to: '/orders',    icon: ShoppingCart,    label: '주문 관리' },
+  { to: '/payments',  icon: CreditCard,      label: '결제 관리' },
+  { to: '/inventory', icon: Package,         label: '재고 관리' },
+  { to: '/monitoring',icon: Activity,        label: '시스템 모니터링' },
+  { to: '/logs',      icon: FileText,        label: '로그 뷰어' },
 ]
 
 export default function Sidebar() {
