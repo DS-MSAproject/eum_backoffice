@@ -1,6 +1,7 @@
 import { useGetDashboardSummaryQuery } from '@/api/monitoringApi'
 import { formatPrice, formatNumber } from '@/shared/utils/formatters'
 import Spinner from '@/shared/components/Spinner'
+import ProductSalesChart from './ProductSalesChart'
 import { ShoppingCart, CreditCard, Package, AlertTriangle, TrendingUp, Activity } from 'lucide-react'
 
 function StatCard({ icon: Icon, label, value, sub, color = 'green' }) {
@@ -52,40 +53,22 @@ export default function DashboardPage() {
         <StatCard icon={Activity} label="서비스 상태" value={`${s.healthyServices ?? 0}/${s.totalServices ?? 0}`} sub="정상 서비스" color={s.healthyServices === s.totalServices ? 'green' : 'red'} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="bg-[#1e293b] rounded-2xl p-5 border border-slate-700/50">
-          <h3 className="text-[14px] font-bold text-white mb-4">최근 주문 상태 분포</h3>
-          {s.orderStatusBreakdown ? (
-            <div className="space-y-2">
-              {Object.entries(s.orderStatusBreakdown).map(([status, count]) => (
-                <div key={status} className="flex items-center justify-between">
-                  <span className="text-[13px] text-slate-400">{status}</span>
-                  <span className="text-[13px] font-bold text-white">{formatNumber(count)}</span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-[13px] text-slate-500">데이터 없음</p>
-          )}
-        </div>
+      <ProductSalesChart />
 
-        <div className="bg-[#1e293b] rounded-2xl p-5 border border-slate-700/50">
-          <h3 className="text-[14px] font-bold text-white mb-4">Kafka Consumer Lag</h3>
-          {s.kafkaLagSummary ? (
-            <div className="space-y-2">
-              {Object.entries(s.kafkaLagSummary).map(([topic, lag]) => (
-                <div key={topic} className="flex items-center justify-between">
-                  <span className="text-[12px] text-slate-400 font-mono">{topic}</span>
-                  <span className={`text-[12px] font-bold ${lag > 100 ? 'text-red-400' : lag > 10 ? 'text-yellow-400' : 'text-emerald-400'}`}>
-                    {formatNumber(lag)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-[13px] text-slate-500">데이터 없음</p>
-          )}
-        </div>
+      <div className="bg-[#1e293b] rounded-2xl p-5 border border-slate-700/50">
+        <h3 className="text-[14px] font-bold text-white mb-4">최근 주문 상태 분포</h3>
+        {s.orderStatusBreakdown ? (
+          <div className="space-y-2">
+            {Object.entries(s.orderStatusBreakdown).map(([status, count]) => (
+              <div key={status} className="flex items-center justify-between">
+                <span className="text-[13px] text-slate-400">{status}</span>
+                <span className="text-[13px] font-bold text-white">{formatNumber(count)}</span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-[13px] text-slate-500">데이터 없음</p>
+        )}
       </div>
     </div>
   )

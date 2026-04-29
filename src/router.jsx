@@ -7,8 +7,8 @@ import OrderManagementPage from '@/features/order/OrderManagementPage'
 import PaymentReconciliationPage from '@/features/payment/PaymentReconciliationPage'
 import InventoryMonitorPage from '@/features/inventory/InventoryMonitorPage'
 import ServiceHealthPage from '@/features/monitoring/ServiceHealthPage'
-import LogViewerPage from '@/features/monitoring/LogViewerPage'
 import ProductManagementPage from '@/features/product/ProductManagementPage'
+import UserManagementPage from '@/features/user/UserManagementPage'
 
 const router = createBrowserRouter([
   {
@@ -30,7 +30,7 @@ const router = createBrowserRouter([
       { path: 'payments', element: <PaymentReconciliationPage /> },
       { path: 'inventory', element: <InventoryMonitorPage /> },
       { path: 'monitoring', element: <ServiceHealthPage /> },
-      { path: 'logs', element: <LogViewerPage /> },
+      { path: 'users', element: <UserManagementPage /> },
     ],
   },
   { path: '*', element: <Navigate to="/dashboard" replace /> },

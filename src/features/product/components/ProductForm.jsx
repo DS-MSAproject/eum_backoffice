@@ -20,7 +20,7 @@ const DEFAULT_FORM = {
   detailImages: [], // [{ imageUrl, imageKey, _uploading }]
 }
 
-export default function ProductForm({ initialValues, onSubmit, isLoading, submitLabel = '등록' }) {
+export default function ProductForm({ initialValues, onSubmit, isLoading, submitLabel = '등록', isEdit = false }) {
   const [form, setForm] = useState(() => {
     const base = { ...DEFAULT_FORM, ...initialValues }
     // normalise images from server response format
@@ -406,12 +406,14 @@ export default function ProductForm({ initialValues, onSubmit, isLoading, submit
         {textarea('전체 성분 목록', 'ingredients')}
       </section>
 
-      {/* 초기 재고 */}
-      <section className="bg-[#1e293b] rounded-xl p-4 space-y-3">
-        <h3 className="text-[13px] font-bold text-slate-300 border-b border-slate-700/50 pb-2">초기 재고</h3>
-        {field('초기 재고 수량 (옵션별)', 'initialStock', 'number')}
-        <p className="text-[11px] text-slate-500">등록 시 각 옵션별로 설정된 수량으로 재고 서비스에 자동 생성됩니다.</p>
-      </section>
+      {/* 초기 재고 — 신규 등록 시에만 표시 */}
+      {!isEdit && (
+        <section className="bg-[#1e293b] rounded-xl p-4 space-y-3">
+          <h3 className="text-[13px] font-bold text-slate-300 border-b border-slate-700/50 pb-2">초기 재고</h3>
+          {field('초기 재고 수량 (옵션별)', 'initialStock', 'number')}
+          <p className="text-[11px] text-slate-500">등록 시 각 옵션별로 설정된 수량으로 재고 서비스에 자동 생성됩니다.</p>
+        </section>
+      )}
 
       {/* 옵션 */}
       <section className="bg-[#1e293b] rounded-xl p-4 space-y-3">

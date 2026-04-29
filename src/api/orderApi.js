@@ -33,6 +33,12 @@ export const adminOrderApi = apiSlice.injectEndpoints({
       ],
     }),
 
+    // ── 제품별 판매량 집계
+    getProductSales: builder.query({
+      query: (params = {}) => ({ url: '/admin/orders/product-sales', params }),
+      providesTags: [{ type: 'ProductSales', id: 'LIST' }],
+    }),
+
     // ── 보상 트랜잭션 수동 실행
     applyCompensation: builder.mutation({
       query: ({ orderId, action }) => ({
@@ -47,6 +53,7 @@ export const adminOrderApi = apiSlice.injectEndpoints({
 })
 
 export const {
+  useGetProductSalesQuery,
   useGetAdminOrdersQuery,
   useGetOrderInconsistenciesQuery,
   useGetOutboxPendingEventsQuery,

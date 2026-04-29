@@ -62,17 +62,6 @@ export const adminProductApi = apiSlice.injectEndpoints({
       },
     }),
 
-    // ── CSV 대량 업로드
-    bulkUploadProducts: builder.mutation({
-      query: (formData) => ({
-        url: '/admin/products/bulk-upload',
-        method: 'POST',
-        body: formData,
-        formData: true,
-      }),
-      invalidatesTags: [{ type: 'AdminProduct', id: 'LIST' }],
-    }),
-
     // ── 카테고리 목록 (등록 폼용) — 백엔드: GET /product/categories (트리 구조)
     getCategories: builder.query({
       query: () => ({ url: '/product/categories' }),
@@ -101,7 +90,6 @@ export const {
   useUpdateAdminProductMutation,
   useDeleteAdminProductMutation,
   useTransitionProductStatusMutation,
-  useBulkUploadProductsMutation,
   useUploadProductImageMutation,
   useGetCategoriesQuery,
 } = adminProductApi

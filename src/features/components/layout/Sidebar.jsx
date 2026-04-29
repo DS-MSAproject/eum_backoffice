@@ -7,10 +7,10 @@ import {
   CreditCard,
   Package,
   Activity,
-  FileText,
   ShieldCheck,
   ChevronRight,
   Store,
+  Users,
 } from 'lucide-react'
 
 const NAV = [
@@ -19,8 +19,8 @@ const NAV = [
   { to: '/orders',     icon: ShoppingCart,    label: '주문 관리' },
   { to: '/payments',   icon: CreditCard,      label: '결제 관리' },
   { to: '/inventory',  icon: Package,         label: '재고 관리' },
+  { to: '/users',      icon: Users,           label: '회원 관리' },
   { to: '/monitoring', icon: Activity,        label: '시스템 모니터링' },
-  { to: '/logs',       icon: FileText,        label: '로그 뷰어' },
 ]
 
 export default function Sidebar() {

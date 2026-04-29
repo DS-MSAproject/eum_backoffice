@@ -3,168 +3,18 @@ import {
   useGetAdminProductsQuery,
   useDeleteAdminProductMutation,
   useCreateAdminProductMutation,
-  useUpdateAdminProductMutation,
-  useGetAdminProductDetailQuery,
 } from '@/api/productApi'
 import { formatPrice, formatDate } from '@/shared/utils/formatters'
 import DataTable from '@/shared/components/DataTable'
-import Spinner from '@/shared/components/Spinner'
 import ProductStatusBadge from './components/ProductStatusBadge'
-import ProductLifecycleFlow from './components/ProductLifecycleFlow'
 import ProductForm from './components/ProductForm'
-import BulkUploadPanel from './components/BulkUploadPanel'
-import { Eye, Pencil, Trash2, X } from 'lucide-react'
+import ProductEditModal from './components/ProductEditModal'
+import ProductDetailModal from './components/ProductDetailModal'
+import { Eye, Pencil, Trash2 } from 'lucide-react'
 
 const LIFECYCLE_STATUSES = ['', 'DRAFT', 'REVIEW', 'READY', 'ON_SALE', 'DISCONTINUED']
-const TABS = ['상품 목록', '상품 등록', '대량 업로드']
+const TABS = ['상품 목록', '상품 등록']
 
-// ── Detail/Edit side panel ─────────────────────────────
-function ProductDetailPanel({ productId, onClose }) {
-  const { data: product, isLoading } = useGetAdminProductDetailQuery(productId, { skip: !productId })
-  const [editMode, setEditMode] = useState(false)
-  const [updateProduct, { isLoading: updating }] = useUpdateAdminProductMutation()
-
-  if (isLoading) return <div className="p-6"><Spinner /></div>
-  if (!product) return null
-
-  const handleUpdate = async (formData) => {
-    await updateProduct({ productId, ...formData })
-    setEditMode(false)
-  }
-
-  return (
-    <div className="h-full flex flex-col">
-      <div className="flex items-center justify-between p-4 border-b border-slate-700/50">
-        <div>
-          <p className="text-[14px] font-bold text-white">{product.productName}</p>
-          <p className="text-[11px] text-slate-400">ID: {product.productId}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setEditMode((v) => !v)}
-            className="p-1.5 text-slate-400 hover:text-white transition"
-          >
-            <Pencil size={14} />
-          </button>
-          <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-white transition">
-            <X size={16} />
-          </button>
-        </div>
-      </div>
-
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {/* Lifecycle flow */}
-        <div className="bg-[#1e293b] rounded-xl p-4">
-          <p className="text-[12px] text-slate-400 mb-3">상품 상태 흐름</p>
-          <ProductLifecycleFlow productId={productId} currentStatus={product.lifecycleStatus} />
-        </div>
-
-        {editMode ? (
-          <ProductForm
-            initialValues={{
-              categoryId: product.categoryId,
-              productName: product.productName,
-              content: product.content,
-              price: String(product.price),
-              brandName: product.brandName ?? '',
-              tags: product.tags ?? '',
-              keywords: product.keywords ?? '',
-              allergens: product.allergens ?? '',
-              ingredients: product.ingredients ?? '',
-              deliveryFee: String(product.deliveryFee ?? 0),
-              deliveryMethod: product.deliveryMethod ?? '일반택배',
-              initialStock: '0',
-              options: (product.options ?? []).map((o) => ({
-                optionName: o.optionName ?? '',
-                extraPrice: String(o.extraPrice ?? 0),
-              })),
-              images: (product.images ?? []).map((img) => ({
-                imageUrl: img.imageUrl,
-                imageKey: img.imageKey,
-                isMain: img.isMain,
-              })),
-              detailImages: (product.detailImages ?? []).map((di) => ({
-                imageUrl: di.imageUrl,
-                imageKey: di.imageKey,
-              })),
-            }}
-            onSubmit={handleUpdate}
-            isLoading={updating}
-            submitLabel="수정 저장"
-          />
-        ) : (
-          <div className="space-y-3">
-            <InfoRow label="카테고리"    value={product.categoryName} />
-            <InfoRow label="브랜드"      value={product.brandName} />
-            <InfoRow label="가격"        value={formatPrice(product.price)} />
-            <InfoRow label="배송비"      value={formatPrice(product.deliveryFee)} />
-            <InfoRow label="배송방법"    value={product.deliveryMethod} />
-            <InfoRow label="알러지"      value={product.allergens} highlight={!product.allergens} />
-            <InfoRow label="성분"        value={product.ingredients} />
-            <InfoRow label="태그"        value={product.tags} />
-            <InfoRow label="등록일"      value={formatDate(product.createdAt)} />
-            <InfoRow label="수정일"      value={formatDate(product.updatedAt)} />
-
-            {product.images?.length > 0 && (
-              <div>
-                <p className="text-[11px] text-slate-500 mb-1.5">상품 이미지 ({product.images.length}개)</p>
-                <div className="grid grid-cols-3 gap-1.5">
-                  {product.images.map((img) => (
-                    <div key={img.imageId} className="relative rounded-lg overflow-hidden border border-slate-700" style={{ aspectRatio: '1/1' }}>
-                      <img src={img.imageUrl} alt="" className="w-full h-full object-cover" />
-                      {img.isMain && (
-                        <span className="absolute top-1 left-1 text-[9px] font-bold bg-amber-500/90 text-white px-1 py-0.5 rounded">대표</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {product.detailImages?.length > 0 && (
-              <div>
-                <p className="text-[11px] text-slate-500 mb-1.5">상세 이미지 ({product.detailImages.length}개)</p>
-                <div className="space-y-1.5">
-                  {product.detailImages.map((di) => (
-                    <div key={di.imageId} className="rounded-lg overflow-hidden border border-slate-700">
-                      <img src={di.imageUrl} alt="" className="w-full object-contain max-h-48" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {product.options?.length > 0 && (
-              <div>
-                <p className="text-[11px] text-slate-500 mb-1">옵션 ({product.options.length}개)</p>
-                <div className="space-y-1">
-                  {product.options.map((o) => (
-                    <div key={o.optionId} className="flex justify-between text-[12px] bg-[#0f172a] rounded px-3 py-1.5">
-                      <span className="text-slate-300">{o.optionName ?? '기본'}</span>
-                      <span className="text-slate-400">{o.extraPrice > 0 ? `+${formatPrice(o.extraPrice)}` : '기본가'}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
-
-function InfoRow({ label, value, highlight }) {
-  if (!value && !highlight) return null
-  return (
-    <div className="flex gap-3">
-      <span className="text-[11px] text-slate-500 w-20 shrink-0">{label}</span>
-      <span className={`text-[12px] ${highlight ? 'text-yellow-400 italic' : 'text-slate-300'}`}>
-        {value ?? '미입력'}
-      </span>
-    </div>
-  )
-}
 
 // ── Main page ──────────────────────────────────────────
 export default function ProductManagementPage() {
@@ -172,6 +22,7 @@ export default function ProductManagementPage() {
   const [page, setPage]             = useState(0)
   const [lifecycleFilter, setFilter] = useState('')
   const [selectedId, setSelectedId]  = useState(null)
+  const [editingId, setEditingId]    = useState(null)
 
   const { data, isLoading } = useGetAdminProductsQuery(
     { page, size: 20, lifecycleStatus: lifecycleFilter || undefined },
@@ -219,12 +70,21 @@ export default function ProductManagementPage() {
           <button
             onClick={() => setSelectedId(r.productId)}
             className="p-1.5 text-slate-400 hover:text-white transition"
+            title="상세 보기"
           >
             <Eye size={14} />
           </button>
           <button
+            onClick={() => setEditingId(r.productId)}
+            className="p-1.5 text-slate-400 hover:text-[#3ea76e] transition"
+            title="수정"
+          >
+            <Pencil size={14} />
+          </button>
+          <button
             onClick={(e) => handleDelete(r.productId, e)}
             className="p-1.5 text-slate-400 hover:text-red-400 transition"
+            title="삭제"
           >
             <Trash2 size={14} />
           </button>
@@ -234,9 +94,7 @@ export default function ProductManagementPage() {
   ]
 
   return (
-    <div className="flex gap-4 h-full min-h-0">
-      {/* Main content */}
-      <div className="flex-1 min-w-0 space-y-5">
+    <div className="space-y-5">
         {/* Tabs */}
         <div className="flex gap-1 bg-[#0f172a] rounded-xl p-1 w-fit">
           {TABS.map((t, i) => (
@@ -310,16 +168,23 @@ export default function ProductManagementPage() {
           </div>
         )}
 
-        {/* Tab 2: 대량 업로드 */}
-        {tab === 2 && <BulkUploadPanel />}
-      </div>
-
-      {/* Side panel */}
+      {/* Detail modal */}
       {selectedId && (
-        <div className="w-96 shrink-0 bg-[#1e293b] rounded-2xl border border-slate-700/50 overflow-hidden">
-          <ProductDetailPanel productId={selectedId} onClose={() => setSelectedId(null)} />
-        </div>
+        <ProductDetailModal
+          productId={selectedId}
+          onClose={() => setSelectedId(null)}
+          onEdit={() => { setEditingId(selectedId); setSelectedId(null) }}
+        />
+      )}
+
+      {/* Edit modal */}
+      {editingId && (
+        <ProductEditModal
+          productId={editingId}
+          onClose={() => setEditingId(null)}
+        />
       )}
     </div>
   )
 }
+

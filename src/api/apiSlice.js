@@ -15,14 +15,29 @@ const rawBaseQuery = fetchBaseQuery({
   },
 })
 
+let isRefreshing = false
+
 const baseQuery = async (args, api, extra) => {
   const result = await rawBaseQuery(args, api, extra)
-  // getAdminMe 는 AdminProtectedRoute 에서 isError 로 처리하므로 제외.
-  // 그 외 401 은 이미 로그인된 상태에서 세션이 만료된 것이므로 logout 처리.
   const url = typeof args === 'string' ? args : args?.url ?? ''
-  if (result.error?.status === 401 && !url.includes('/admin/auth/me')) {
+
+  if (result.error?.status === 401 && !url.includes('/admin/auth/me') && !url.includes('/admin/auth/refresh')) {
+    if (!isRefreshing) {
+      isRefreshing = true
+      const refreshResult = await rawBaseQuery(
+        { url: '/admin/auth/refresh', method: 'POST' },
+        api,
+        extra,
+      )
+      isRefreshing = false
+
+      if (refreshResult.data) {
+        return rawBaseQuery(args, api, extra)
+      }
+    }
     api.dispatch({ type: 'auth/logout' })
   }
+
   return result
 }
 
@@ -34,15 +49,14 @@ export const apiSlice = createApi({
     'AdminProduct',
     'Category',
     'AdminOrder',
+    'ProductSales',
     'AdminPayment',
     'AdminInventory',
     'AdminEvent',
     'AdminMonitoring',
     'AdminOutbox',
-    'AdminKafka',
     'AdminService',
-    'AdminLog',
-    'AuditLog',
+    'AdminUser',
   ],
   endpoints: () => ({}),
 })

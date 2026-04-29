@@ -3,9 +3,10 @@ import { useAppSelector } from '@/hooks/useAppSelector'
 import { toggleSidebar, addToast, selectSidebarCollapsed } from '@/features/ui/uiSlice'
 import { useAdminLogoutMutation } from '@/api/authApi'
 import useAdminAuth from '@/features/auth/useAdminAuth'
-import { PanelLeftClose, PanelLeftOpen, LogOut, Bell } from 'lucide-react'
+import { PanelLeftClose, PanelLeftOpen, LogOut, Search } from 'lucide-react'
+import NotificationCenter from './NotificationCenter'
 
-export default function TopBar({ title }) {
+export default function TopBar({ title, onSearchOpen }) {
   const dispatch = useAppDispatch()
   const collapsed = useAppSelector(selectSidebarCollapsed)
   const { admin } = useAdminAuth()
@@ -32,9 +33,16 @@ export default function TopBar({ title }) {
 
       <h1 className="text-[15px] font-bold text-white flex-1">{title}</h1>
 
-      <button className="text-slate-400 hover:text-slate-200 transition-colors relative">
-        <Bell size={18} />
+      <button
+        onClick={onSearchOpen}
+        className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-[12px] text-slate-400 hover:border-slate-500 hover:text-slate-200 transition-colors"
+      >
+        <Search size={13} />
+        <span>검색</span>
+        <kbd className="text-[10px] border border-slate-600 rounded px-1 ml-1">⌘K</kbd>
       </button>
+
+      <NotificationCenter />
 
       <div className="flex items-center gap-2">
         <div className="w-8 h-8 rounded-full bg-[#3ea76e]/20 flex items-center justify-center">
