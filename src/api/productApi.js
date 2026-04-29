@@ -53,6 +53,15 @@ export const adminProductApi = apiSlice.injectEndpoints({
       ],
     }),
 
+    // ── 상품 이미지 S3 업로드 → { imageUrl } 반환
+    uploadProductImage: builder.mutation({
+      query: (file) => {
+        const formData = new FormData()
+        formData.append('file', file)
+        return { url: '/admin/products/image-upload', method: 'POST', body: formData }
+      },
+    }),
+
     // ── CSV 대량 업로드
     bulkUploadProducts: builder.mutation({
       query: (formData) => ({
@@ -64,10 +73,22 @@ export const adminProductApi = apiSlice.injectEndpoints({
       invalidatesTags: [{ type: 'AdminProduct', id: 'LIST' }],
     }),
 
-    // ── 카테고리 목록 (등록 폼용)
+    // ── 카테고리 목록 (등록 폼용) — 백엔드: GET /product/categories (트리 구조)
     getCategories: builder.query({
-      query: () => ({ url: '/category/list' }),
+      query: () => ({ url: '/product/categories' }),
       providesTags: [{ type: 'Category', id: 'LIST' }],
+      // 트리 → 평탄화: 부모 + 자식 모두 선택 가능하게
+      transformResponse: (res) => {
+        const flat = []
+        const flatten = (nodes, prefix = '') => {
+          nodes.forEach((node) => {
+            flat.push({ categoryId: node.categoryId, categoryName: prefix ? `${prefix} > ${node.name}` : node.name })
+            if (node.children?.length) flatten(node.children, node.name)
+          })
+        }
+        flatten(Array.isArray(res) ? res : [])
+        return flat
+      },
     }),
 
   }),
@@ -81,5 +102,6 @@ export const {
   useDeleteAdminProductMutation,
   useTransitionProductStatusMutation,
   useBulkUploadProductsMutation,
+  useUploadProductImageMutation,
   useGetCategoriesQuery,
 } = adminProductApi

@@ -62,12 +62,11 @@ function ProductDetailPanel({ productId, onClose }) {
         {editMode ? (
           <ProductForm
             initialValues={{
-              categoryId: product.categoryName,
+              categoryId: product.categoryId,
               productName: product.productName,
               content: product.content,
               price: String(product.price),
               brandName: product.brandName ?? '',
-              imageUrl: product.imageUrl ?? '',
               tags: product.tags ?? '',
               keywords: product.keywords ?? '',
               allergens: product.allergens ?? '',
@@ -78,6 +77,15 @@ function ProductDetailPanel({ productId, onClose }) {
               options: (product.options ?? []).map((o) => ({
                 optionName: o.optionName ?? '',
                 extraPrice: String(o.extraPrice ?? 0),
+              })),
+              images: (product.images ?? []).map((img) => ({
+                imageUrl: img.imageUrl,
+                imageKey: img.imageKey,
+                isMain: img.isMain,
+              })),
+              detailImages: (product.detailImages ?? []).map((di) => ({
+                imageUrl: di.imageUrl,
+                imageKey: di.imageKey,
               })),
             }}
             onSubmit={handleUpdate}
@@ -96,6 +104,35 @@ function ProductDetailPanel({ productId, onClose }) {
             <InfoRow label="태그"        value={product.tags} />
             <InfoRow label="등록일"      value={formatDate(product.createdAt)} />
             <InfoRow label="수정일"      value={formatDate(product.updatedAt)} />
+
+            {product.images?.length > 0 && (
+              <div>
+                <p className="text-[11px] text-slate-500 mb-1.5">상품 이미지 ({product.images.length}개)</p>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {product.images.map((img) => (
+                    <div key={img.imageId} className="relative rounded-lg overflow-hidden border border-slate-700" style={{ aspectRatio: '1/1' }}>
+                      <img src={img.imageUrl} alt="" className="w-full h-full object-cover" />
+                      {img.isMain && (
+                        <span className="absolute top-1 left-1 text-[9px] font-bold bg-amber-500/90 text-white px-1 py-0.5 rounded">대표</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {product.detailImages?.length > 0 && (
+              <div>
+                <p className="text-[11px] text-slate-500 mb-1.5">상세 이미지 ({product.detailImages.length}개)</p>
+                <div className="space-y-1.5">
+                  {product.detailImages.map((di) => (
+                    <div key={di.imageId} className="rounded-lg overflow-hidden border border-slate-700">
+                      <img src={di.imageUrl} alt="" className="w-full object-contain max-h-48" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {product.options?.length > 0 && (
               <div>

@@ -31,6 +31,8 @@ export const apiSlice = createApi({
   baseQuery,
   tagTypes: [
     'Auth',
+    'AdminProduct',
+    'Category',
     'AdminOrder',
     'AdminPayment',
     'AdminInventory',
